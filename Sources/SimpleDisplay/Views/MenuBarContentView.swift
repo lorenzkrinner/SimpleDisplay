@@ -152,11 +152,10 @@ struct MenuBarContentView: View {
                 displayListContent
             }
         }
-        .background(PopoverWindowReader { viewModel.popoverWindow = $0 })
         .frame(width: 500)
         .fixedSize(horizontal: false, vertical: true)
         .onAppear {
-            // Fix TextField focus in MenuBarExtra .window style
+            // Keep text fields ready for keyboard input when the popover opens.
             NSApp.activate(ignoringOtherApps: true)
             // Re-sync with the live display topology each time the popover opens,
             // so any state left stale by an async reconfiguration self-corrects.

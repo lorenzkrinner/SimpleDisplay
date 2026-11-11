@@ -32,7 +32,7 @@ final class DisplayManagerViewModel {
     var virtualDisplayIDs: Set<CGDirectDisplayID> = []
     /// Custom names for virtual displays (macOS assigns generic names like "Display 25")
     var virtualDisplayNames: [CGDirectDisplayID: String] = [:]
-    @ObservationIgnored weak var popoverWindow: NSWindow?
+    @ObservationIgnored var dismissPopover: (() -> Void)?
     var requestQuitFromPopover: (() -> Void)?
     var errorMessage: String?
     var isLoading: Bool = false
@@ -753,7 +753,7 @@ final class DisplayManagerViewModel {
     }
 
     func previewAgent() {
-        popoverWindow?.close()
+        dismissPopover?()
         agentPreviewController.show()
     }
 

@@ -10,8 +10,10 @@ private let logger = Logger(subsystem: "app.simpledisplay", category: "URLScheme
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let viewModel = DisplayManagerViewModel()
     private var quitRequestedFromPopover = false
+    private var menuBarController: MenuBarPopoverController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        menuBarController = MenuBarPopoverController(viewModel: viewModel)
         viewModel.requestQuitFromPopover = { [weak self] in
             guard let self else { return }
             self.quitRequestedFromPopover = true
