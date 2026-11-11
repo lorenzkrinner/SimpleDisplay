@@ -3,6 +3,7 @@ import SwiftUI
 struct MenuBarContentView: View {
     @Environment(DisplayManagerViewModel.self) private var viewModel
     @Environment(LocaleManager.self) private var locale
+    @State private var displayListHeight: CGFloat = 200
 
     private var configuringDisplay: DisplayInfo? {
         guard case .configuringDisplay(let id) = viewModel.navigationState else { return nil }
@@ -153,6 +154,7 @@ struct MenuBarContentView: View {
         }
         .background(PopoverWindowReader { viewModel.popoverWindow = $0 })
         .frame(width: 500)
+        .fixedSize(horizontal: false, vertical: true)
         .onAppear {
             // Fix TextField focus in MenuBarExtra .window style
             NSApp.activate(ignoringOtherApps: true)
@@ -178,19 +180,25 @@ struct MenuBarContentView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 40)
         } else {
-            // Note: minHeight is required because SwiftUI MenuBarExtra (.window) can
-            // size the popover to 0 height when the ScrollView's lazy content reports
-            // no intrinsic size at first evaluation, leaving the rows invisible.
+            // Measure the rows so a short list does not reserve the full scroll limit.
             ScrollView {
-                LazyVStack(spacing: 4) {
+                VStack(spacing: 4) {
                     ForEach(viewModel.displays) { display in
                         DisplayRowView(display: display)
                     }
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 4)
+                .background {
+                    GeometryReader { geometry in
+                        Color.clear.preference(key: DisplayListHeightKey.self, value: geometry.size.height)
+                    }
+                }
             }
-            .frame(minHeight: 200, maxHeight: 450)
+            .frame(height: min(displayListHeight, 450))
+            .onPreferenceChange(DisplayListHeightKey.self) { height in
+                if height > 0 { displayListHeight = height }
+            }
         }
 
         Divider()
@@ -231,5 +239,12 @@ struct MenuBarContentView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
+    }
+}
+
+private struct DisplayListHeightKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }
