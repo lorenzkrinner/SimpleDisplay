@@ -5,6 +5,11 @@ final class URLCommandTests: XCTestCase {
 
     // MARK: - Happy paths
 
+    func testPreviewCommandRoundTrips() throws {
+        XCTAssertEqual(try parse("simpledisplay://preview"), .preview)
+        XCTAssertEqual(try URLCommandParser.parse(URLCommand.preview.url).get(), .preview)
+    }
+
     func testParseOpen() {
         let cmd = try! parse("simpledisplay://open")
         XCTAssertEqual(cmd, .open)

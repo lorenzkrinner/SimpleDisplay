@@ -22,6 +22,7 @@ public enum URLCommand: Equatable, Sendable {
     /// Dump the current display list as JSON to /tmp/simpledisplay-status.json
     /// so remote controllers (SSH + open) can read machine-readable state.
     case status
+    case preview
     case open
 }
 
@@ -43,7 +44,7 @@ public enum URLCommandError: Error, Equatable, Sendable, CustomStringConvertible
         case .wrongScheme(let found):
             return "expected scheme 'simpledisplay', got '\(found ?? "<none>")'"
         case .unknownHost(let host):
-            return "unknown action '\(host)' — expected create/remove/reconfigure/enable/disable/mirror/unmirror/mode/status/open"
+            return "unknown action '\(host)' — expected create/remove/reconfigure/enable/disable/mirror/unmirror/mode/status/preview/open"
         case .missingHost:
             return "URL has no action (expected simpledisplay://<action>)"
         case .missingParameter(let name):
@@ -96,6 +97,8 @@ public enum URLCommandParser {
             return parseTarget(params).flatMap { target in parseMode(params, target: target) }
         case "status":
             return .success(.status)
+        case "preview":
+            return .success(.preview)
         case "open":
             return .success(.open)
         default:
@@ -358,6 +361,8 @@ extension URLCommand {
             components.queryItems = items
         case .status:
             components.host = "status"
+        case .preview:
+            components.host = "preview"
         case .open:
             components.host = "open"
         }

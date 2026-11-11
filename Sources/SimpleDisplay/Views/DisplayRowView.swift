@@ -11,23 +11,6 @@ struct DisplayRowView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            // Configure button (virtual displays only)
-            if display.isVirtual {
-                Button {
-                    if isConfiguring {
-                        viewModel.navigate(to: .displayList)
-                    } else {
-                        viewModel.navigate(to: .configuringDisplay(display.id))
-                    }
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.callout)
-                        .foregroundStyle(isConfiguring ? .blue : .secondary)
-                }
-                .buttonStyle(.borderless)
-                .disabled(viewModel.isBusy || viewModel.isNavigating)
-            }
-
             Image(systemName: iconName)
                 .font(.title2)
                 .foregroundStyle(iconColor)
@@ -70,6 +53,39 @@ struct DisplayRowView: View {
 
             Spacer()
 
+            if display.isVirtual {
+                Button {
+                    if isConfiguring {
+                        viewModel.navigate(to: .displayList)
+                    } else {
+                        viewModel.navigate(to: .configuringDisplay(display.id))
+                    }
+                } label: {
+                    Image(systemName: "gearshape")
+                        .font(.callout)
+                        .symbolRenderingMode(.monochrome)
+                        .foregroundStyle(isConfiguring ? Color.blue : Color(nsColor: .secondaryLabelColor))
+                }
+                .buttonStyle(.borderless)
+                .disabled(viewModel.isBusy || viewModel.isNavigating)
+            }
+
+            if display.isVirtual && display.name == "Agent" {
+                Button {
+                    viewModel.previewAgent()
+                } label: {
+                    Image(systemName: "pip.enter")
+                        .font(.callout)
+                        .symbolRenderingMode(.monochrome)
+                        .foregroundStyle(Color(nsColor: .secondaryLabelColor))
+                }
+                .buttonStyle(.borderless)
+                .help(locale.t("preview_agent"))
+                .accessibilityLabel(locale.t("preview_agent"))
+                .accessibilityIdentifier("preview-agent")
+                .disabled(viewModel.isBusy || !display.isActive)
+            }
+
             // Mirror onto main / stop mirroring: a separate, reversible state
             // from on/off. Physical displays only: a virtual display as a mirror
             // slave crashes the window server. Needs another display to mirror onto.
@@ -79,7 +95,8 @@ struct DisplayRowView: View {
                 } label: {
                     Image(systemName: display.isMirrored ? "rectangle.on.rectangle.fill" : "rectangle.on.rectangle")
                         .font(.callout)
-                        .foregroundStyle(display.isMirrored ? .teal : .secondary)
+                        .symbolRenderingMode(.monochrome)
+                        .foregroundStyle(display.isMirrored ? Color.teal : Color(nsColor: .secondaryLabelColor))
                 }
                 .buttonStyle(.borderless)
                 .help(locale.t(display.isMirrored ? "unmirror_button_help" : "mirror_button_help"))

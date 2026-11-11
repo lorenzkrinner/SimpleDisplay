@@ -32,6 +32,8 @@ final class DisplayManagerViewModel {
     var virtualDisplayIDs: Set<CGDirectDisplayID> = []
     /// Custom names for virtual displays (macOS assigns generic names like "Display 25")
     var virtualDisplayNames: [CGDirectDisplayID: String] = [:]
+    @ObservationIgnored weak var popoverWindow: NSWindow?
+    var requestQuitFromPopover: (() -> Void)?
     var errorMessage: String?
     var isLoading: Bool = false
 
@@ -48,6 +50,7 @@ final class DisplayManagerViewModel {
     /// Reference to locale manager for localized messages
     var locale: LocaleManager?
 
+    private let agentPreviewController = AgentPreviewController()
     private let displayService = DisplayService()
     private let virtualService = VirtualDisplayService()
     private let statePersistence = DisplayStatePersistence()
@@ -741,8 +744,24 @@ final class DisplayManagerViewModel {
         DispatchQueue.main.async { self.executeNow(urlCommand: command) }
     }
 
+    func quitFromPopover() {
+        requestQuitFromPopover?()
+    }
+
+    func closePreview() {
+        agentPreviewController.close()
+    }
+
+    func previewAgent() {
+        popoverWindow?.close()
+        agentPreviewController.show()
+    }
+
     private func executeNow(urlCommand command: URLCommand) {
         switch command {
+        case .preview:
+            previewAgent()
+
         case .open:
             navigate(to: .displayList)
             NSApp.activate(ignoringOtherApps: true)

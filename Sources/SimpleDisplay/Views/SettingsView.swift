@@ -4,6 +4,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(DisplayManagerViewModel.self) private var viewModel
     @Environment(LocaleManager.self) private var locale
+    @AppStorage("hideDockIconWhenWindowsClosed") private var hideDockIconWhenWindowsClosed = true
     @State private var launchAtLogin: Bool = false
     @State private var loginItemNeedsApproval: Bool = false
     /// Prevents onChange from firing during initial onAppear value loading
@@ -75,6 +76,21 @@ struct SettingsView: View {
                                         .foregroundStyle(.orange)
                                 }
                                 .padding(.leading, 36)
+                            }
+                        }
+                    }
+
+                    settingsRow {
+                        HStack(alignment: .top, spacing: 10) {
+                            settingsIcon("macwindow", color: .purple)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Toggle(locale.t("hide_dock_icon"), isOn: $hideDockIconWhenWindowsClosed)
+                                    .toggleStyle(.checkbox)
+                                    .font(.callout)
+                                Text(locale.t("hide_dock_icon_help"))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .padding(.leading, 20)
                             }
                         }
                     }

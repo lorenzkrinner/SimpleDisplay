@@ -151,6 +151,7 @@ struct MenuBarContentView: View {
                 displayListContent
             }
         }
+        .background(PopoverWindowReader { viewModel.popoverWindow = $0 })
         .frame(width: 500)
         .onAppear {
             // Fix TextField focus in MenuBarExtra .window style
@@ -201,7 +202,8 @@ struct MenuBarContentView: View {
             } label: {
                 Image(systemName: "gearshape")
                     .font(.callout)
-                    .foregroundStyle(.secondary)
+                    .symbolRenderingMode(.monochrome)
+                    .foregroundStyle(Color(nsColor: .secondaryLabelColor))
             }
             .buttonStyle(.borderless)
             .disabled(viewModel.isNavigating)
@@ -221,7 +223,7 @@ struct MenuBarContentView: View {
             Spacer()
 
             Button(locale.t("quit")) {
-                NSApplication.shared.terminate(nil)
+                viewModel.quitFromPopover()
             }
             .buttonStyle(.borderless)
             .font(.callout)

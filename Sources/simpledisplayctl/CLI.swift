@@ -24,6 +24,7 @@ struct CLI {
         case "mirror":      runSetMirrored(rest, mirrored: true)
         case "unmirror":    runSetMirrored(rest, mirrored: false)
         case "mode":        runSetMode(rest)
+        case "preview":     dispatch(.preview)
         case "open":        runOpen()
         case "status":      runStatus()
         case "-h", "--help", "help":
@@ -166,6 +167,7 @@ private func printUsage() {
       mode         --id N | --name S --width N --height N [--hidpi | --no-hidpi] [--refresh N]
                    Switch a display to one of the modes it offers (points; --hidpi
                    picks the Retina "looks like" variant).
+      preview      Open the view-only Agent display preview.
       open         Focus the SimpleDisplay menu bar app.
       status       Print whether SimpleDisplay is installed / running.
       --version    Print CLI version.

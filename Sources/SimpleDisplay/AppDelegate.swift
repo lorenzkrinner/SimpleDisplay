@@ -9,6 +9,29 @@ private let logger = Logger(subsystem: "app.simpledisplay", category: "URLScheme
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let viewModel = DisplayManagerViewModel()
+    private var quitRequestedFromPopover = false
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        viewModel.requestQuitFromPopover = { [weak self] in
+            guard let self else { return }
+            self.quitRequestedFromPopover = true
+            NSApp.terminate(nil)
+        }
+    }
+
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        if quitRequestedFromPopover { return .terminateNow }
+        // Preserve macOS logout/restart/shutdown while treating ordinary Quit as Close.
+        if let reason = NSAppleEventManager.shared().currentAppleEvent?
+            .paramDescriptor(forKeyword: AEKeyword(kAEQuitReason))?.enumCodeValue,
+           [kAEQuitAll, kAEShutDown, kAERestart, kAEReallyLogOut].contains(reason) {
+            return .terminateNow
+        }
+        viewModel.closePreview()
+        return .terminateCancel
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 
     // remotedesk: dedupe entre application(_:open:) y el handler GURL de Apple Events.
     private var lastHandled: (url: String, time: Date)?
