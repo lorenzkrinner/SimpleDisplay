@@ -17,6 +17,33 @@
 
 ---
 
+## Agent preview fork
+
+This is a fork of [SamuelRioTz/SimpleDisplay](https://github.com/SamuelRioTz/SimpleDisplay) with an optional local viewer for an agent's virtual screen. The original display-management features and GPL-3.0 license are preserved.
+
+### Live preview
+
+Name a virtual display **Agent**, move the agent's task windows there, and click its preview icon. The viewer stays on a physical display when one is available. Closing it leaves Agent running.
+
+![Live Agent display preview showing Calculator](docs/images/agent-preview.jpg)
+
+### Display and window controls
+
+- **Preview from the display row.** The preview icon sits beside the display settings gear. Opening it dismisses the menu-bar popover.
+- **View-only window.** `SimpleDisplay (Agent)` shows live content without forwarding clicks or typing. The retry icon is in the title bar, and the image fills the content area.
+- **Window-aware Dock icon.** The **Hide Dock Icon** setting shows the Dock icon while the viewer is open and hides it when all windows close. Disable it to keep the Dock icon visible.
+- **Close without stopping agents.** Command-Q closes the viewer. Use the popover's **Quit** button to stop the app and its virtual displays.
+- **Compact controls.** The popover fits its display rows, and global and per-display settings use matching outlined gears.
+- **Automation.** Open the viewer with `open 'simpledisplay://preview'` or `simpledisplayctl preview`.
+
+![Agent display controls and preview icon](docs/images/display-controls.jpg)
+
+![Dock icon setting](docs/images/window-settings.jpg)
+
+The viewer needs Screen Recording permission, requested only when opened. A virtual display does not create independent mouse input or prevent system sleep. Background input depends on the agent's computer-use tool; closed-lid work also needs macOS to remain awake.
+
+These additions are source-build features. Upstream release downloads below do **not** include this fork's preview.
+
 ## Features
 
 - **Enable/Disable displays** — turn monitors off for real (they go dark and leave the desktop) and back on, without unplugging them
@@ -45,16 +72,13 @@ Since v1.6.1 the DMG is signed with a Developer ID and notarized by Apple, so it
 ### Build from source
 
 ```bash
-git clone https://github.com/SamuelRioTz/SimpleDisplay.git
+git clone https://github.com/lorenzkrinner/SimpleDisplay.git
 cd SimpleDisplay
-make dmg
-open .build/SimpleDisplay.app
-
-# Optional: install the CLI for automation
-make cli-install          # /usr/local/bin/simpledisplayctl
+bash scripts/build-local-preview.sh
+open .build/local-preview/SimpleDisplay.app
 ```
 
-Requires Xcode Command Line Tools (`xcode-select --install`).
+The preview build uses a local signature and is not notarized by the upstream developer. See [preview build and permission details](LOCAL-PREVIEW.md), including SDK selection and using your own signing identity. The original `make dmg` and CLI build targets remain available with a complete Xcode toolchain.
 
 ## Automation
 
